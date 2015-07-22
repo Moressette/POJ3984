@@ -1,0 +1,73 @@
+#include<iostream>
+#include<stack>
+#include<cstring>
+#include<vector>
+#include<cstdio>
+using namespace std;
+
+struct  node
+{
+   int a,b;
+};
+
+int maze[7][7];
+bool vis[7][7];
+
+stack<node>passby;
+
+void init()
+{
+   memset(vis,0,sizeof(vis));   //布尔型vis初始化0，记录是否访问过
+   for(int i=0;i<7;i++)         //迷宫四周围墙设为1
+    {
+       maze[i][0]=1;
+       maze[0][i]=1;
+       maze[6][i]=1;
+       maze[i][6]=1;
+    }
+}
+
+
+void dfs(int x,int y)
+{
+    if(!vis[x][y])     // 如果没有访问过
+    {
+        node cur;     //cur为当前位置
+        cur.a=x;
+        cur.b=y;
+        vis[x][y]=1;  //当前位置cur设为已访问
+        passby.push(cur); //入栈
+    }
+    if(x==5&&y==5)     //如果到迷宫出口 返回
+        return ;
+    if(!vis[x+1][y]&&!maze[x+1][y])  //如果右面的一个没有访问过而且不是墙，就向右走
+        dfs(x+1,y);
+    else if(!vis[x][y+1]&&!maze[x][y+1]) //如果下面的一个没有访问过且不是墙，向下走
+        dfs(x,y+1);
+    else                                 //右面和下面都有墙
+    {
+        passby.pop();                   //pop，后退一步
+        node cur=passby.top();          //将当前位置cur置为栈顶元素，即上一步位置
+        dfs(cur.a,cur.b);               //对当前cur位置继续进行如上dfs操作
+    }
+}
+a
+int main()
+{
+    for(int i=1;i<=5;i++)
+        for(int j=1;j<=5;j++)
+            scanf("%d",&maze[i][j]); //建立迷宫内部
+    init();                          //初始化
+    dfs(1,1);                       //从头开始走
+    vector<node>v;                  //node容器，用于输出。
+    while(passby.empty()==false)     //如果栈非空
+    {                                   /*用容器实现栈的自底输出*/
+        v.push_back(passby.top());   //在容器尾部加入栈顶元素
+        passby.pop();                  //pop栈顶元素
+    }                                   /*这样就把栈内所有元素放入容器中*/
+    for(int i=v.size()-1;i>=0;i--)
+    {
+        printf("(%d, %d)\n",v[i].a-1,v[i].b-1);
+    }
+    return 0;
+}
